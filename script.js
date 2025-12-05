@@ -1,12 +1,3 @@
-/**
- * G.A.T. PLAYER v2.2 (Final Polished)
- * Features: 
- * - Auto Cyber-Gradient generation for missing covers
- * - Blob based image decoding (High Performance)
- * - 3 Visualizer Modes
- * - High DPI Canvas support
- */
-
 const state = {
     files: [],
     playlist: [], 
@@ -16,12 +7,11 @@ const state = {
     source: null,
     isPlaying: false,
     gainNode: null,
-    visualizerMode: 0, // 0: Bars, 1: Mirror, 2: Scope
+    visualizerMode: 0,
     modes: ['BARS', 'MIRROR', 'SCOPE'],
     animationId: null
 };
 
-// DOM Elements
 const elements = {
     audio: new Audio(),
     fileInput: document.getElementById('folder-input'),
@@ -42,7 +32,6 @@ const elements = {
     artistDisplay: document.getElementById('current-artist')
 };
 
-// --- Theme Manager ---
 const savedTheme = localStorage.getItem('gat_theme');
 if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
@@ -55,7 +44,6 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
     });
 });
 
-// --- Audio Engine ---
 function initAudioEngine() {
     if (!state.audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -78,7 +66,6 @@ function initAudioEngine() {
     }
 }
 
-// --- File Ingestion ---
 elements.fileInput.addEventListener('change', async (e) => {
     initAudioEngine();
     const rawFiles = Array.from(e.target.files).filter(f => 
@@ -104,7 +91,6 @@ function processFilesChunked(files, index) {
     for (let i = index; i < limit; i++) {
         const file = files[i];
         
-        // 初始元数据
         const trackData = {
             index: i,
             file: file,
@@ -113,12 +99,10 @@ function processFilesChunked(files, index) {
             cover: null
         };
 
-        // 立即创建卡片（显示默认生成的渐变背景）
         const card = createCard(trackData);
         elements.playlistContainer.appendChild(card);
         state.playlist.push(trackData);
 
-        // 尝试读取 ID3 标签
         if(typeof jsmediatags !== 'undefined') {
             new jsmediatags.Reader(file)
                 .setTagsToRead(["title", "artist", "picture"])
@@ -137,11 +121,9 @@ function processFilesChunked(files, index) {
                                 console.warn("Cover decode failed:", err);
                             }
                         }
-                        // 更新界面（如果有封面，会覆盖掉默认渐变）
                         updateCard(trackData);
                     },
                     onError: (error) => {
-                        // console.log('No tags found for:', file.name);
                     }
                 });
         }
@@ -152,16 +134,13 @@ function processFilesChunked(files, index) {
     }
 }
 
-// --- UI Generation (Enhanced) ---
 function createCard(track) {
     const div = document.createElement('div');
     div.className = 'track-card';
     div.id = `card-${track.index}`;
     div.onclick = () => playTrack(track.index);
     
-    // 核心新增：生成确定性的随机赛博渐变色（基于索引）
-    // 这样即使没有封面，每首歌看起来也不一样
-    const hue1 = (track.index * 137) % 360; // 伪随机色相
+    const hue1 = (track.index * 137) % 360;
     const hue2 = (hue1 + 40) % 360;
     const placeholderStyle = `background: linear-gradient(135deg, hsl(${hue1}, 60%, 20%), hsl(${hue2}, 70%, 10%));`;
 
@@ -183,16 +162,13 @@ function updateCard(track) {
     if(titleEl) titleEl.textContent = track.title;
     if(artistEl) artistEl.textContent = track.artist;
     
-    // 只有当真的读取到了图片时，才替换掉默认的渐变背景
     if(artEl && track.cover) {
         artEl.innerHTML = `<img src="${track.cover}" alt="Cover" style="width:100%;height:100%;object-fit:cover;display:block;">`;
-        // 清除之前的背景样式，防止透出
         artEl.style.background = 'none';
         artEl.style.border = 'none';
     }
 }
 
-// --- Playback Control ---
 function playTrack(index) {
     if (index < 0 || index >= state.playlist.length) return;
 
@@ -237,7 +213,6 @@ function updatePlayButton() {
     elements.btnPlay.textContent = state.isPlaying ? "||" : "| |";
 }
 
-// --- Visualizer Engine (High DPI) ---
 elements.visModeBtn.addEventListener('click', () => {
     state.visualizerMode = (state.visualizerMode + 1) % state.modes.length;
     elements.visModeBtn.textContent = `[ MODE: ${state.modes[state.visualizerMode]} ]`;
@@ -273,7 +248,7 @@ function visualize() {
         
         const colors = getThemeColors();
         
-        if (state.visualizerMode === 0) { // BARS
+        if (state.visualizerMode === 0) {
             state.analyser.getByteFrequencyData(dataArray);
             const barWidth = (rect.width / bufferLength) * 2.5;
             let x = 0;
@@ -287,7 +262,7 @@ function visualize() {
                 x += barWidth + 1;
             }
         } 
-        else if (state.visualizerMode === 1) { // MIRROR
+        else if (state.visualizerMode === 1) {
             state.analyser.getByteFrequencyData(dataArray);
             const barWidth = (rect.width / bufferLength) * 4;
             const cy = rect.height / 2;
@@ -303,7 +278,7 @@ function visualize() {
             }
             ctx.globalAlpha = 1.0;
         } 
-        else if (state.visualizerMode === 2) { // SCOPE
+        else if (state.visualizerMode === 2) {
             state.analyser.getByteTimeDomainData(dataArray);
             ctx.lineWidth = 2;
             ctx.strokeStyle = colors.primary;
@@ -329,7 +304,6 @@ function visualize() {
     draw();
 }
 
-// --- Listeners ---
 elements.btnPlay.addEventListener('click', togglePlay);
 elements.btnPrev.addEventListener('click', () => playTrack(state.currentIndex - 1));
 elements.btnNext.addEventListener('click', () => playTrack(state.currentIndex + 1));
