@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="cyber"> <!-- 默认主题 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.A.T. PLAYER</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 全局特效层 -->
+    <div class="crt-overlay"></div>
+    <div class="scanline"></div>
+    
+    <!-- 3D 动态网格背景 -->
+    <div class="perspective-grid">
+        <div class="grid-floor"></div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <div class="brand">
+                <div class="glitch-wrapper" data-text="G.A.T.">G.A.T.</div>
+                <p class="subtitle">SYSTEM_READY <span class="blink">_</span></p>
+            </div>
+            
+            <!-- 系统控制台 -->
+            <div class="sys-controls">
+                <div class="control-group">
+                    <span class="label">THEME_OPT:</span>
+                    <div class="theme-switcher">
+                        <button class="theme-btn" data-set-theme="cyber" style="background:#00ffcc"></button>
+                        <button class="theme-btn" data-set-theme="sunset" style="background:#ff0055"></button>
+                        <button class="theme-btn" data-set-theme="matrix" style="background:#00ff00"></button>
+                        <button class="theme-btn" data-set-theme="rust" style="background:#ff9900"></button>
+                    </div>
+                </div>
+                <label for="folder-input" class="cyber-btn small">
+                    [ LOAD_SOURCE ]
+                    <input type="file" id="folder-input" webkitdirectory directory multiple hidden>
+                </label>
+            </div>
+        </header>
+
+        <main>
+            <section class="visualizer-section">
+                <div class="panel-header">
+                    <span class="panel-title">/// VISUAL_CORE</span>
+                    <!-- 可视化模式切换 -->
+                    <button id="vis-mode-btn" class="text-btn">[ MODE: BARS ]</button>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="visualizer"></canvas>
+                </div>
+                <div class="track-info-display">
+                    <h2 id="current-title">NO_DATA_STREAM</h2>
+                    <div class="meta-row">
+                        <span id="current-artist">--</span>
+                        <span id="codec-info" class="tag">MP3 320kbps</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="playlist-section">
+                <div class="panel-header">/// DATA_INDEX <span id="track-count">(0)</span></div>
+                <div id="playlist-container" class="playlist-grid"></div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="playback-controls">
+                <button id="btn-prev" class="cyber-icon-btn">|&lt;</button>
+                <button id="btn-play" class="cyber-icon-btn">| |</button>
+                <button id="btn-next" class="cyber-icon-btn">&gt;|</button>
+            </div>
+            
+            <div class="progress-container">
+                <span id="time-current">00:00</span>
+                <div class="range-wrapper">
+                    <input type="range" id="seek-bar" value="0" min="0" step="0.1">
+                    <div class="range-fill" id="seek-fill"></div>
+                </div>
+                <span id="time-total">00:00</span>
+            </div>
+
+            <div class="volume-controls">
+                <span class="vol-icon">VOL</span>
+                <input type="range" id="volume-bar" value="0.8" max="1" step="0.05">
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
